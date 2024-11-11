@@ -46,3 +46,45 @@ const addNewBlog = async (req, res) => {
   }
   return res.status(200).json({ newlyCreateBlog });
 };
+
+const deleteABlog = async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const findCurrentBlog = await Blog.findByIdAndDelete(id);
+    if (!findCurrentBlog) {
+      return res.status(404).json({ message: "Blog not found" });
+    }
+    return res.status(200).json({ message: "Successfully Deleted" });
+  } catch (e) {
+    console.log(e);
+    return res
+      .status(500)
+      .json({ message: "Unable to delete ! Please try again" });
+  }
+};
+
+const updateBlog = async (req, res) => {
+  const id = req.params.id;
+
+  const { title, description } = req.body;
+  let currentBlogToUpdate;
+
+  try {
+    currentBlogToUpdate = await Blog.findByIdAndUpdate(id, {
+      title,
+      description,
+    });
+  } catch (e) {
+    console.log(e);
+    return res.send(500).json({
+      message: "Something went wrong while updating ! Please try again",
+    });
+  }
+  if (!currentBlogToUpdate) {
+    return res.status(500).json({ message: "Unable to update" });
+  }
+  return res.send(200).json({ currentBlogToUpdate });
+};
+
+module.exports({ fetchListOfBlogs, updateBlog, deleteABlog, addNewBlog });
